@@ -134,14 +134,6 @@ public final class AutonMaster extends LinearOpMode {
                                         new SleepAction(3.5),
                                         slideDown(),
                                         doorUp()
-//                                        new SleepAction(8),
-//                                        servoClose(),
-//                                        new SleepAction(2),
-//                                        spinUp(),
-//                                        new SleepAction(1),
-//                                        servoOpen(),
-//                                        new SleepAction(0.5),
-//                                        spinDown()
                                 ),
                                 new SequentialAction(
                                         drive.actionBuilder(drive.pose)
