@@ -70,8 +70,9 @@ public final class AutonMasterLeft extends LinearOpMode {
 
         String teamPropLocation = new String("notFound");
         while (!isStarted() && !isStopRequested()) {
-            if (teamPropLocation.equals("notFound")) {
-                teamPropLocation = myRobot.telemetryTfod();
+            String newPropLoc = myRobot.telemetryTfod();
+            if (!newPropLoc.equals("notFound")){
+                teamPropLocation = newPropLoc;
             }
             telemetry.addData("team prop location: ", teamPropLocation);
             telemetry.addData("go to: ", teamPropLocation);
@@ -106,14 +107,14 @@ public final class AutonMasterLeft extends LinearOpMode {
                                 new SequentialAction(
                                         drive.actionBuilder(drive.pose)
                                                 .waitSeconds(1)
-                                                .strafeToLinearHeading(new Vector2d(-19, 55), Math.toRadians(270))
+                                                .strafeToLinearHeading(new Vector2d(-20.3, 55), Math.toRadians(270))
                                                 .waitSeconds(0.1)
                                                 .waitSeconds(2)
                                                 .strafeToLinearHeading(new Vector2d(-10,60.5), Math.toRadians(180))
-                                                .strafeToLinearHeading(new Vector2d(6,38), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(5,39), Math.toRadians(180))
                                                 .waitSeconds(4)
-                                                .strafeToLinearHeading(new Vector2d(0,38), Math.toRadians(180))
-                                                .strafeToLinearHeading(new Vector2d(0,60), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(-2,39), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(-2,60), Math.toRadians(180))
                                                 .build()
                                 )
                         )
@@ -121,7 +122,7 @@ public final class AutonMasterLeft extends LinearOpMode {
             }
 
             //`asdf`
-            if (teamPropLocation == "notFound" || teamPropLocation == "middle") {
+            if (teamPropLocation.equals("notFound") || teamPropLocation.equals( "middle")) {
                 Actions.runBlocking(new SequentialAction(
                         new ParallelAction(
                                 new SequentialAction(
@@ -146,9 +147,10 @@ public final class AutonMasterLeft extends LinearOpMode {
                                                 .strafeToLinearHeading(new Vector2d(-34,36), Math.toRadians(180))
                                                 .waitSeconds(1)
                                                 .strafeToLinearHeading(new Vector2d(-8.5,35), Math.toRadians(180))
-                                                .strafeToLinearHeading(new Vector2d(0,35), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(3,35), Math.toRadians(180))
                                                 .waitSeconds(4)
-                                                .strafeToLinearHeading(new Vector2d(0,60), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(-2,35), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(-2,60), Math.toRadians(180))
                                                 .build()
                                 )
                         )
@@ -177,7 +179,8 @@ public final class AutonMasterLeft extends LinearOpMode {
                                                 .waitSeconds(2)
                                                 .strafeToLinearHeading(new Vector2d(8,30), Math.toRadians(180))
                                                 .waitSeconds(3)
-                                                .strafeToLinearHeading(new Vector2d(0,60), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(1.5,30), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(-2,60), Math.toRadians(180))
                                                 .build()
                                 )
                         )
@@ -443,11 +446,10 @@ class OurRobotOk{
         for (Recognition recognition : currentRecognitions) {
             double x = (recognition.getLeft() + recognition.getRight()) / 2;
             double y = (recognition.getTop() + recognition.getBottom()) / 2;
-            if (x <= 190) {
+            if (x <= 328) {
                 return "left";
-            } else if (x <= 465) {
-                return "middle";
-            } else {
+            }
+            else {
                 return "right";
             }
         }

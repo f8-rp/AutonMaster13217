@@ -60,7 +60,7 @@ public final class AutonMasterRed extends LinearOpMode {
 
        sleep(2000);
 
-        final double DELAY = 6;
+        final double DELAY = 0;
 
         armSwing.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armSwing.setTargetPosition(1500);
@@ -73,8 +73,9 @@ public final class AutonMasterRed extends LinearOpMode {
 
         String teamPropLocation = new String("notFound");
         while (!isStarted() && !isStopRequested()) {
-            if (teamPropLocation.equals("notFound")) {
-                teamPropLocation = myRobot.telemetryTfod();
+            String newPropLoc = myRobot.telemetryTfod();
+            if (!newPropLoc.equals("notFound")){
+                teamPropLocation = newPropLoc;
             }
             telemetry.addData("team prop location: ", teamPropLocation);
             telemetry.addData("go to: ", teamPropLocation);
@@ -97,7 +98,7 @@ public final class AutonMasterRed extends LinearOpMode {
                                 new SequentialAction(
                                         new SleepAction(DELAY),
                                         spinDown(),
-                                        new SleepAction(1),
+                                        new SleepAction(2),
                                         servoOpen(),
                                         new SleepAction(8),
                                         slideUp(),
@@ -111,13 +112,15 @@ public final class AutonMasterRed extends LinearOpMode {
                                         drive.actionBuilder(drive.pose)
                                                 .waitSeconds(DELAY+1)
                                                 //-34 64
-                                                .strafeToLinearHeading(new Vector2d(-45, -50), Math.toRadians(90))
-                                                .waitSeconds(1)
+                                                .strafeToLinearHeading(new Vector2d(-47, -50), Math.toRadians(90))
+                                                .waitSeconds(2)
                                                 .strafeToLinearHeading(new Vector2d(-34, -37), Math.toRadians(180))
                                                 .strafeToLinearHeading(new Vector2d(-37, -60.5), Math.toRadians(180)) // get back
                                                 .strafeToLinearHeading(new Vector2d(48, -60.5), Math.toRadians(180)) // get back to board
                                                 .strafeToLinearHeading(new Vector2d(52,-33), Math.toRadians(180))
-                                                .strafeToLinearHeading(new Vector2d(50.5,-33), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(49,-33), Math.toRadians(180))
+                                                .waitSeconds(4)
+                                                .strafeToLinearHeading(new Vector2d(46,-33), Math.toRadians(180))
                                                 .build()
                                 )
                         )
@@ -125,7 +128,7 @@ public final class AutonMasterRed extends LinearOpMode {
             }
 
             //asdf
-            if (teamPropLocation == "notFound" || teamPropLocation == "middle") {
+            if (teamPropLocation.equals("notFound") || teamPropLocation == "middle") {
                 Actions.runBlocking(new SequentialAction(
                         new ParallelAction(
                                 new SequentialAction(
@@ -157,7 +160,9 @@ public final class AutonMasterRed extends LinearOpMode {
                                                 .turn(Math.toRadians(90))
                                                 .strafeToLinearHeading(new Vector2d(-33, -60.5), Math.toRadians(180)) // get back
                                                 .strafeToLinearHeading(new Vector2d(48, -60.5), Math.toRadians(180)) // get back to board
-                                                .strafeToLinearHeading(new Vector2d(52,-40), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(49.4,-40), Math.toRadians(180))
+                                                .waitSeconds(4)
+                                                .strafeToLinearHeading(new Vector2d(45,-40), Math.toRadians(180))
                                                 .build()
 //
                                 )
@@ -171,7 +176,7 @@ public final class AutonMasterRed extends LinearOpMode {
                                 new SequentialAction(
                                         new SleepAction(DELAY),
                                         spinDown(),
-                                        new SleepAction(4),
+                                        new SleepAction(5),
                                         servoOpen(),
                                         new SleepAction(10),
                                         slideUp(),
@@ -192,7 +197,8 @@ public final class AutonMasterRed extends LinearOpMode {
                                                 .strafeToLinearHeading(new Vector2d(-33, -60.5), Math.toRadians(180)) // get back
                                                 .strafeToLinearHeading(new Vector2d(48, -60.5), Math.toRadians(180)) // get back to board
                                                 .strafeToLinearHeading(new Vector2d(51, -45), Math.toRadians(180))
-                                                .waitSeconds(2)
+                                                .waitSeconds(4)
+                                                .strafeToLinearHeading(new Vector2d(47, -45), Math.toRadians(180))
                                                 .build()
                                 )
                         )
@@ -254,7 +260,7 @@ public final class AutonMasterRed extends LinearOpMode {
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
                     slide.setPower(-1);
-                    sleep(300);
+                    sleep(600);
                     slide.setPower(-0.1);
 
                     initialized = true;
@@ -279,7 +285,7 @@ public final class AutonMasterRed extends LinearOpMode {
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
                     slide.setPower(1);
-                    sleep(300);
+                    sleep(600);
                     slide.setPower(0);
                     initialized = true;
                 }
@@ -459,11 +465,10 @@ class OurRobotRed{
         for (Recognition recognition : currentRecognitions) {
             double x = (recognition.getLeft() + recognition.getRight()) / 2;
             double y = (recognition.getTop() + recognition.getBottom()) / 2;
-            if (x <= 190) {
+            if (x <= 328) {
                 return "left";
-            } else if (x <= 465) {
-                return "middle";
-            } else {
+            }
+            else {
                 return "right";
             }
         }

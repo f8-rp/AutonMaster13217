@@ -30,9 +30,8 @@
 package org.firstinspires.ftc.teamcode;
 
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.CRServo;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -66,13 +65,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="13217 CodoDragons TeleOp", group="Linear Opmode")
+@TeleOp(name="13217 CodoDragons TeleOpVControl")
 
 public class CodoTeleOp extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftFrontDrive = null;
+
+
 
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
@@ -96,10 +97,17 @@ public class CodoTeleOp extends LinearOpMode {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
-        leftFrontDrive  = hardwareMap.get(DcMotor.class, "leftFront");
-        leftBackDrive  = hardwareMap.get(DcMotor.class, "leftBack");
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFront");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "rightBack");
+//        leftFrontDrive  = hardwareMap.get(DcMotor.class, "leftFront");
+//        leftBackDrive  = hardwareMap.get(DcMotor.class, "leftBack");
+//        rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFront");
+//        rightBackDrive = hardwareMap.get(DcMotor.class, "rightBack");
+
+
+
+        Motor lf = new Motor(hardwareMap, "leftFront", Motor.GoBILDA.RPM_435);
+        Motor rf = new Motor(hardwareMap, "rightFront", Motor.GoBILDA.RPM_435);
+        Motor rb = new Motor(hardwareMap, "rightBack", Motor.GoBILDA.RPM_435);
+        Motor lb = new Motor(hardwareMap, "leftBack", Motor.GoBILDA.RPM_435);
 
         armSwing = hardwareMap.get(DcMotor.class, "arm");
         slide = hardwareMap.get(DcMotor.class, "slide");
@@ -107,6 +115,26 @@ public class CodoTeleOp extends LinearOpMode {
         door = hardwareMap.get(Servo.class, "door");
         release = hardwareMap.get(Servo.class, "release");
 
+        lf.setRunMode(Motor.RunMode.VelocityControl);
+        rf.setRunMode(Motor.RunMode.VelocityControl);
+        rb.setRunMode(Motor.RunMode.VelocityControl);
+        lb.setRunMode(Motor.RunMode.VelocityControl);
+
+        lf.setVeloCoefficients(0.6, 0, 0.01);
+        lf.setFeedforwardCoefficients(0.92, 0.47);
+        lf.setFeedforwardCoefficients(0.92, 0.47, 0.3);
+
+        rf.setVeloCoefficients(0.6, 0, 0.01);
+        rf.setFeedforwardCoefficients(0.92, 0.47);
+        rf.setFeedforwardCoefficients(0.92, 0.47, 0.3);
+
+        rb.setVeloCoefficients(0.6, 0, 0.01);
+        rb.setFeedforwardCoefficients(0.92, 0.47);
+        rb.setFeedforwardCoefficients(0.92, 0.47, 0.3);
+
+        lb.setVeloCoefficients(0.6, 0, 0.01);
+        lb.setFeedforwardCoefficients(0.92, 0.47);
+        lb.setFeedforwardCoefficients(0.92, 0.47, 0.3);
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -118,23 +146,31 @@ public class CodoTeleOp extends LinearOpMode {
         // when you first test your robot, push the left joystick forward and observe the direction the wheels turn.
         // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
         // Keep testing until ALL the wheels move the robot forward when you push the left joystick forward.
-        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+//        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+//        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
+//        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+//        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
         class dropOnPresenter implements Runnable{
             public void run(){
                 hand.setPosition(0.9);
                 sleep(1000);
-                armSwing.setTargetPosition(1510);
+                armSwing.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armSwing.setTargetPosition(1490);
                 armSwing.setPower(0.6);
                 sleep(1500);
                 hand.setPosition(0.3);
                 sleep(1000);
                 armSwing.setTargetPosition(0);
                 armSwing.setPower(0.6);
+            }
+        }
 
+        class slideDown implements Runnable{
+            public void run(){
+                slide.setPower(1);
+                sleep(2000);
+                slide.setPower(0);
             }
         }
 
@@ -175,6 +211,7 @@ public class CodoTeleOp extends LinearOpMode {
 
         Thread dropOnPresent = new Thread(new dropOnPresenter());
         Thread backdropPlace = new Thread(new putOnBackdrop());
+        Thread goDown = new Thread(new slideDown());
 
         // run until the end of the match (driver presses STOP)
 
@@ -184,10 +221,11 @@ public class CodoTeleOp extends LinearOpMode {
 
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial   = -gamepad1.left_stick_y * reverse;  // Note: pushing stick forward gives negative value
-            double lateral =  gamepad1.left_stick_x * reverse ;
-            double yaw     =  gamepad1.right_stick_x ;
 
+
+            double axial   = -gamepad1.left_stick_y * reverse;  // Note: pushing stick forward gives negative value
+            double lateral =  gamepad1.left_stick_x * reverse;
+            double yaw     =  gamepad1.right_stick_x;
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
@@ -238,14 +276,13 @@ public class CodoTeleOp extends LinearOpMode {
                     }
                     else if(gamepad2.y){
                         //slide DOWN
-                        slide.setPower(1);
-                        sleep(2000);
+                        goDown.start();
                         isSlideDown = true;
                     }
                     else if(gamepad2.b){
                         //slide down
                         isSlideDown = false;
-                        slide.setPower(0.75);
+                        slide.setPower(1);
                     }
                     else{
                         slide.setPower(-0.1);
@@ -271,8 +308,17 @@ public class CodoTeleOp extends LinearOpMode {
 
             if(gamepad2.x){
                 armSwing.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                armSwing.setPower(-1);
-                sleep(100);
+                armSwing.setPower(0.4);
+                sleep(50);
+                armSwing.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                armSwing.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armSwing.setTargetPosition(0);
+            }
+
+            if(gamepad2.start){
+                armSwing.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                armSwing.setPower(-0.4);
+                sleep(50);
                 armSwing.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 armSwing.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 armSwing.setTargetPosition(0);
@@ -297,22 +343,22 @@ public class CodoTeleOp extends LinearOpMode {
             }
 
             if(gamepad1.a){
-                increment = 0.25;
-                mult= 0.25;
+                increment = 0.37;
+                mult= 0.37;
             }
             if (gamepad1.right_trigger == 1){
                 increment = 1;
                 mult= 1;
             }
             if(gamepad1.b){
-                increment = 0.37;
-                mult= 0.37;
+                increment = 0.5;
+                mult= 0.5;
             }
             if(gamepad1.x){
-                increment = 0.75;
-                mult = 0.75;
+                increment = 1.0;
+                mult = 1.0;
             }
-            if (max > 0.8) {
+            if (max > 1.0) {
                 leftFrontPower  /= max;
                 rightFrontPower /= max;
                 leftBackPower   /= max;
@@ -340,11 +386,18 @@ public class CodoTeleOp extends LinearOpMode {
 
 
 
-            leftFrontDrive.setPower(leftFrontPower*increment*1);
-            rightFrontDrive.setPower(rightFrontPower*increment);
-            leftBackDrive.setPower(leftBackPower*increment*1);
-            rightBackDrive.setPower(rightBackPower*increment);
-
+//            leftFrontDrive.setPower(leftFrontPower*increment*1);
+//            rightFrontDrive.setPower(rightFrontPower*increment);
+//            leftBackDrive.setPower(leftBackPower*increment*1);
+//            rightBackDrive.setPower(rightBackPower*increment);
+//            lf.set(-(leftFrontPower*increment));
+//            rf.set(rightFrontPower*increment);
+//            lb.set(-(leftBackPower*increment));
+//            rb.set(rightBackPower*increment);
+            lf.set(-leftFrontPower * increment);
+            rf.set(rightFrontPower);
+            lb.set(-leftBackPower * increment);
+            rb.set(rightBackPower);
 
             // Show the elapsed game time and wheel power.*/
             telemetry.addData("encoder position", armSwing.getCurrentPosition());

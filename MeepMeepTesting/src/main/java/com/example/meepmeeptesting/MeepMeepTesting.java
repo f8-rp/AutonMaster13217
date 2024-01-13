@@ -82,10 +82,13 @@ public class MeepMeepTesting {
 //                .strafeToLinearHeading(new Vector2d(56,-34), Math.toRadians(180))
 
 
-                .strafeToLinearHeading(new Vector2d(-40, -35), Math.toRadians(90)) //up
-                .waitSeconds(2)
-                .turn(Math.toRadians(-90))
-                .waitSeconds(5)
+                .strafeToLinearHeading(new Vector2d(-45, -50), Math.toRadians(90))
+                .waitSeconds(1)
+                .strafeToLinearHeading(new Vector2d(-34, -37), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(-37, -60.5), Math.toRadians(180)) // get back
+                .strafeToLinearHeading(new Vector2d(48, -60.5), Math.toRadians(180)) // get back to board
+                .strafeToLinearHeading(new Vector2d(52,-33), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(50.5,-33), Math.toRadians(180))
                 .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_JUICE_DARK)

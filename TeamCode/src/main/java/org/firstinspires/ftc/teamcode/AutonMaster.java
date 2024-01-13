@@ -46,7 +46,7 @@ public final class AutonMaster extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        final double startDELAY = 6;
+        final double startDELAY = 0;
         VisionPortal.Builder build = new VisionPortal.Builder();
         build.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
 
@@ -70,8 +70,9 @@ public final class AutonMaster extends LinearOpMode {
 
         String teamPropLocation = new String("notFound");
         while (!isStarted() && !isStopRequested()) {
-            if (teamPropLocation.equals("notFound")) {
-                teamPropLocation = myRobot.telemetryTfod();
+            String newPropLoc = myRobot.telemetryTfod();
+            if (!newPropLoc.equals("notFound")){
+                teamPropLocation = newPropLoc;
             }
             telemetry.addData("team prop location: ", teamPropLocation);
             telemetry.addData("go to: ", teamPropLocation);
@@ -94,7 +95,7 @@ public final class AutonMaster extends LinearOpMode {
                                 new SequentialAction(
                                         new SleepAction(startDELAY),
                                         spinDown(),
-                                        new SleepAction(1),
+                                        new SleepAction(2),
                                         servoOpen(),
                                         new SleepAction(8),
                                         slideUp(),
@@ -106,12 +107,16 @@ public final class AutonMaster extends LinearOpMode {
                                 ),
                                 new SequentialAction(
                                         drive.actionBuilder(drive.pose)
-                                                .waitSeconds(startDELAY+1)
-                                                .splineTo(new Vector2d(-31, 42), Math.toRadians(315))
+                                                .waitSeconds(startDELAY+1.5)
+                                                .splineTo(new Vector2d(-33, 46.5), Math.toRadians(310))
                                                 .waitSeconds(1)
                                                 .strafeToLinearHeading(new Vector2d(-40, 61), Math.toRadians(180)) //get back
                                                 .strafeToLinearHeading(new Vector2d(35,59.5), Math.toRadians(180)) //get to board
-                                                .strafeToLinearHeading(new Vector2d(54,37.2), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(40,42), Math.toRadians(180))
+
+                                                .strafeToLinearHeading(new Vector2d(54,42), Math.toRadians(180))
+                                                .waitSeconds(3)
+                                                .strafeToLinearHeading(new Vector2d(45,42), Math.toRadians(180))
                                                 .build()
                                 )
                         )
@@ -119,13 +124,13 @@ public final class AutonMaster extends LinearOpMode {
             }
 
             //asdf
-            if (teamPropLocation == "notFound" || teamPropLocation == "middle") {
+            if (teamPropLocation.equals("notFound") || teamPropLocation.equals("middle")) {
                 Actions.runBlocking(new SequentialAction(
                         new ParallelAction(
                                 new SequentialAction(
                                         new SleepAction(startDELAY),
                                         spinDown(),
-                                        new SleepAction(0.5),
+                                        new SleepAction(1),
                                         servoOpen(),
                                         new SleepAction(8),
                                         slideUp(),
@@ -143,8 +148,10 @@ public final class AutonMaster extends LinearOpMode {
                                                 .strafeToLinearHeading(new Vector2d(-40, 61), Math.toRadians(180)) //get back
                                                 .strafeToLinearHeading(new Vector2d(35,59.5), Math.toRadians(180)) //get to board
                                                 .strafeToLinearHeading(new Vector2d(40,35.6), Math.toRadians(180))
-                                                .strafeToLinearHeading(new Vector2d(56,32.6), Math.toRadians(180))
-                                                .strafeToLinearHeading(new Vector2d(53,32.6), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(40,32.6), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(55,32.6), Math.toRadians(180))
+                                                .waitSeconds(4)
+                                                .strafeToLinearHeading(new Vector2d(49,32.6), Math.toRadians(180))
                                                 .build()
 //                                        drive.actionBuilder(new Pose2d(new Vector2d(52,32), Math.toRadians(180)))
 //                                                .waitSeconds(3)
@@ -188,7 +195,10 @@ public final class AutonMaster extends LinearOpMode {
                                                 .strafeToLinearHeading(new Vector2d(-40, 61), Math.toRadians(180)) //get back
                                                 .strafeToLinearHeading(new Vector2d(35,59.5), Math.toRadians(180)) //get to board
                                                 .strafeToLinearHeading(new Vector2d(40,35.6), Math.toRadians(180))
-                                                .strafeToLinearHeading(new Vector2d(53,28), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(40,28), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(58,28), Math.toRadians(180))
+                                                .waitSeconds(4)
+                                                .strafeToLinearHeading(new Vector2d(45,28), Math.toRadians(180))
                                                 .build()
                                 )
                         )
@@ -200,7 +210,6 @@ public final class AutonMaster extends LinearOpMode {
 
     public Action doorDown() {
         return new Action() {
-
             private boolean initialized = false;
 
             @Override
@@ -250,7 +259,7 @@ public final class AutonMaster extends LinearOpMode {
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
                     slide.setPower(-1);
-                    sleep(300);
+                    sleep(550);
                     slide.setPower(-0.1);
 
                     initialized = true;
@@ -275,7 +284,7 @@ public final class AutonMaster extends LinearOpMode {
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
                     slide.setPower(1);
-                    sleep(300);
+                    sleep(550);
                     slide.setPower(0);
                     initialized = true;
                 }
@@ -455,11 +464,10 @@ class OurRobot{
         for (Recognition recognition : currentRecognitions) {
             double x = (recognition.getLeft() + recognition.getRight()) / 2;
             double y = (recognition.getTop() + recognition.getBottom()) / 2;
-            if (x <= 190) {
+            if (x <= 328) {
                 return "left";
-            } else if (x <= 465) {
-                return "middle";
-            } else {
+            }
+            else {
                 return "right";
             }
         }

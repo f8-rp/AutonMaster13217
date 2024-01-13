@@ -70,8 +70,9 @@ public final class AutonMasterRedRight extends LinearOpMode {
 
         String teamPropLocation = new String("notFound");
         while (!isStarted() && !isStopRequested()) {
-            if (teamPropLocation.equals("notFound")) {
-                teamPropLocation = myRobot.telemetryTfod();
+            String newPropLoc = myRobot.telemetryTfod();
+            if (!newPropLoc.equals("notFound")){
+                teamPropLocation = newPropLoc;
             }
             telemetry.addData("team prop location: ", teamPropLocation);
             telemetry.addData("go to: ", teamPropLocation);
@@ -111,10 +112,10 @@ public final class AutonMasterRedRight extends LinearOpMode {
                                                 .strafeToLinearHeading(new Vector2d(-26.6, -35), Math.toRadians(180))
                                                 .waitSeconds(2.4)
                                                 .strafeToLinearHeading(new Vector2d(4, -35), Math.toRadians(180))
-                                                .strafeToLinearHeading(new Vector2d(10, -27), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(10, -24), Math.toRadians(180))
                                                 .waitSeconds(4)
-                                                .strafeToLinearHeading(new Vector2d(2, -27), Math.toRadians(180))
-                                                .strafeToLinearHeading(new Vector2d(4, -60), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(-2, -27), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(-2, -60), Math.toRadians(180))
                                                 .build()
                                 )
                         )
@@ -122,7 +123,7 @@ public final class AutonMasterRedRight extends LinearOpMode {
             }
 
             //asdf
-            if (teamPropLocation == "notFound" || teamPropLocation == "middle") {
+            if (teamPropLocation.equals("notFound") || teamPropLocation.equals( "middle")) {
                 Actions.runBlocking(new SequentialAction(
                         new ParallelAction(
                                 new SequentialAction(
@@ -154,8 +155,8 @@ new SleepAction(3)
                                                 .turn(Math.toRadians(90))
                                                 .strafeToLinearHeading(new Vector2d(8,-39.4), Math.toRadians(180))
                                                 .waitSeconds(5)
-                                                .strafeToLinearHeading(new Vector2d(5, -39.4), Math.toRadians(180))
-                                                .strafeToLinearHeading(new Vector2d(4, -60), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(-2, -39.4), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(-2, -60), Math.toRadians(180))
                                                 .build()
                                 )
                         )
@@ -184,8 +185,8 @@ new SleepAction(3)
                                                 .waitSeconds(2)
                                                 .strafeToLinearHeading(new Vector2d(8, -43), Math.toRadians(180))
                                                 .waitSeconds(4)
-                                                .strafeToLinearHeading(new Vector2d(2, -43), Math.toRadians(180))
-                                                .strafeToLinearHeading(new Vector2d(4, -60), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(-2, -43), Math.toRadians(180))
+                                                .strafeToLinearHeading(new Vector2d(-2, -60), Math.toRadians(180))
                                                 .build()
                                 )
                         )
